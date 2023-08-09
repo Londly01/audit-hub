@@ -26,11 +26,14 @@ $content = htmlspecialchars_decode($content, ENT_QUOTES);
 0x01 EXP编写
 
 很明显插入 <?=exec('whoami')能进行绕过
-![图片](https://github.com/Londly01/audit-hub/assets/118274389/14c4fdea-122e-43d4-b12f-6617fb457137)
+
+![图片](https://github.com/Londly01/audit-hub/assets/118274389/4140dd3a-ed30-442d-8e26-ba45601521e4)
+
 
 成功命令执行
 
-![图片](https://github.com/Londly01/audit-hub/assets/118274389/d702908d-4688-4769-8927-08b964d50312)
+![图片](https://github.com/Londly01/audit-hub/assets/118274389/21b24246-0796-405d-b0e7-c0bbbc17ab66)
+
 
 
 
