@@ -1,4 +1,10 @@
+
+
+0x00 漏洞定位分析
+
+
 漏洞定位到关键文件application\admin\logic\FilemanagerLogic.php 
+
 
 ```
 $content = htmlspecialchars_decode($content, ENT_QUOTES);
@@ -6,5 +12,5 @@ $content = htmlspecialchars_decode($content, ENT_QUOTES);
                 return "模板里不允许有php语法，为了安全考虑，请通过FTP工具进行编辑上传。";
             }
 
-
 ```
+
