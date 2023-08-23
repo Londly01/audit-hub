@@ -126,4 +126,39 @@ include('template/'.$xtcms_bdyun.'/bplay.php');
 $result = mysql_query('select * from xtcms_vod where d_id = '.$_GET['play'].' ');
 
 ```
-这个GET传入的play参数是没有单引号或者双引号包裹的，所以Seay工具报了这个错误，此时我们跟在进一下include的文件,也就是system/inc.php，查看一下这个文件
+这个GET传入的play参数是没有单引号或者双引号包裹的，所以Seay工具报了这个错误，此时我们跟在进一下全局文件中include的文件,也就是system/inc.php，查看一下这个文件
+
+```
+<?php
+require_once('conn.php');
+require_once('library.php');
+require_once('function.php');
+require_once('config.php');
+?>
+
+```
+查看library.php文件
+```
+if (!defined('PCFINAL')) {
+	exit('Request Error!');
+}
+if (!get_magic_quotes_gpc()) {
+	if (!empty($_GET)) {
+		$_GET = addslashes_deep($_GET);
+	}
+	if (!empty($_POST)) {
+		$_POST = addslashes_deep($_POST);
+	}
+	$_COOKIE = addslashes_deep($_COOKIE);
+	$_REQUEST = addslashes_deep($_REQUEST);
+}
+function addslashes_deep($_var_0)
+{
+	if (empty($_var_0)) {
+		return $_var_0;
+	} else {
+		return is_array($_var_0) ? array_map('addslashes_deep', $_var_0) : addslashes($_var_0);
+	}
+```
+
+magic_quotes_gpc函数在php中的做用是判断解析用户提示的数据，如包括有:post、get、cookie过来的数据增长转义字符“\”，以确保这些数据不会引发程序，特别是数据库语句由于特殊字符(单引号，双引号，反斜线）引发的污染而出现致命的错误。
