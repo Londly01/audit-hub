@@ -1,4 +1,4 @@
-## 0x00 SQL注入代码审计
+## 0x00 SQL注入代码审计1
 
 Seay工具审出可能存在SQL注入漏洞位置如下：
 
@@ -162,3 +162,78 @@ function addslashes_deep($_var_0)
 ```
 
 magic_quotes_gpc函数在php中的做用是判断解析用户提示的数据所以传入post、get、cookie过来的数据增长转义字符“\”，但是现在做这个已经没有意义了，此处还是存在SQL注入漏洞
+
+## 0x00 SQL注入代码审计2
+
+     seay审计出其他路径存在SQL注入漏洞，看一下代码
+
+     <?php include('../system/inc.php');
+error_reporting(0);
+$op=$_GET['op'];
+if(!isset($_SESSION['user_name'])){
+  alert_href('请登陆后进入','login.php?op=login');
+ };
+ //退出
+if ($op == 'out'){ 
+unset($_SESSION['user_name']);
+unset($_SESSION['user_group']);
+if (! empty ( $_COOKIE ['user_name'] ) || ! empty ( $_COOKIE ['user_password'] ))   
+    {  
+        setcookie ( "user_name", null, time () - 3600 * 24 * 365 );  
+        setcookie ( "user_password", null, time () - 3600 * 24 * 365 );  
+    }  
+header('location:login.php?op=login');
+}
+//支付
+if ( isset($_POST['paysave']) ) {
+if ($_POST['pay']==1){
+
+//判定会员组别
+$result = mysql_query('select * from xtcms_user where u_name="'.$_SESSION['user_name'].'"');
+if($row = mysql_fetch_array($result)){
+
+$u_points=$row['u_points'];
+$u_group=$row['u_group'];
+$send = $row['u_end'];
+
+//获取会员卡信息
+$card= mysql_query('select * from xtcms_userka where id="'.$_POST['cardid'].'"');
+if($row2 = mysql_fetch_array($card)){
+$day=$row2['day'];//天数
+$userid=$row2['userid'];//会员组
+$jifen=$row2['jifen'];//积分
+}
+//判定会员组
+if ($row['u_group']>$userid){ 
+alert_href('您现在所属会员组的权限制大于等于目标会员组权限值，不需要升级!','mingxi.php');
+}
+
+
+此处存在SQL注入点可能为  
+
+```
+$result = mysql_query('select * from xtcms_user where u_name="'.$_SESSION['user_name'].'"');
+```
+
+传入的参数进行了""闭合，看看通过闭合双引号进行绕过限制，继续跟全局过滤代码：
+
+```
+if (!get_magic_quotes_gpc()) {
+	if (!empty($_GET)) {
+		$_GET = addslashes_deep($_GET);
+	}
+	if (!empty($_POST)) {
+		$_POST = addslashes_deep($_POST);
+	}
+	$_COOKIE = addslashes_deep($_COOKIE);
+	$_REQUEST = addslashes_deep($_REQUEST);
+}
+function addslashes_deep($_var_0)
+{
+	if (empty($_var_0)) {
+		return $_var_0;
+	} else {
+		return is_array($_var_0) ? array_map('addslashes_deep', $_var_0) : addslashes($_var_0);
+```
+
+其中addslashes_deep负责对用户提交的数据进行转义(如',",\)，所以没法闭合双引号，此处不存在SQL注入
