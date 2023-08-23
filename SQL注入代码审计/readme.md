@@ -126,7 +126,7 @@ include('template/'.$xtcms_bdyun.'/bplay.php');
 $result = mysql_query('select * from xtcms_vod where d_id = '.$_GET['play'].' ');
 
 ```
-这个GET传入的play参数是没有单引号或者双引号包裹的，所以Seay工具报了这个错误，此时我们跟在进一下全局文件中include的文件,也就是system/inc.php，查看一下这个文件
+这个GET传入的play参数是没有单引号或者双引号包裹的，肯定存在SQL注入漏洞，所以Seay工具报了这个错误，此时我们在跟进一下全局文件中include的文件,也就是system/inc.php，查看一下这个文件
 
 ```
 <?php
@@ -161,4 +161,4 @@ function addslashes_deep($_var_0)
 	}
 ```
 
-magic_quotes_gpc函数在php中的做用是判断解析用户提示的数据，如包括有:post、get、cookie过来的数据增长转义字符“\”，以确保这些数据不会引发程序，特别是数据库语句由于特殊字符(单引号，双引号，反斜线）引发的污染而出现致命的错误。
+magic_quotes_gpc函数在php中的做用是判断解析用户提示的数据所以传入post、get、cookie过来的数据增长转义字符“\”，但是现在做这个已经没有意义了，此处还是存在SQL注入漏洞
