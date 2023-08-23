@@ -121,4 +121,9 @@ include('template/'.$xtcms_bdyun.'/bplay.php');
 ?>
 
 ```
+关键语句报的SQL注入为：
+```
+$result = mysql_query('select * from xtcms_vod where d_id = '.$_GET['play'].' ');
 
+```
+这个GET传入的play参数是没有单引号或者双引号包裹的，所以Seay工具报了这个错误，此时我们跟在进一下include的文件,也就是system/inc.php，查看一下这个文件
