@@ -165,7 +165,7 @@ function addslashes_deep($_var_0)
 
 magic_quotes_gpc函数在php中的做用是判断解析用户提示的数据所以传入post、get、cookie过来的数据增长转义字符“\”，但是现在做这个已经没有意义了，此处还是存在SQL注入漏洞
 
-## 0x00 SQL注入代码审计2
+## 0x01 SQL注入代码审计2
 
      seay审计出其他路径存在SQL注入漏洞，看一下代码
 
@@ -239,3 +239,45 @@ function addslashes_deep($_var_0)
 ```
 
 其中addslashes_deep负责对用户提交的数据进行转义(如',",\)，所以没法闭合双引号，此处不存在SQL注入
+
+## 0x02 SQL注入代码审计3
+
+```
+elseif($action=='ck_login'){
+	global $submit,$user,$password,$_sys,$code;
+	$submit=$_POST['submit'];
+	$user=fl_html(fl_value($_POST['user']));
+	$password=fl_html(fl_value($_POST['password']));
+	$code=$_POST['code'];
+	if(!isset($submit)){
+		msg('请从登陆页面进入');
+	}
+	if(empty($user)||empty($password)){
+		msg("密码或用户名不能为空");
+	}
+	if(!empty($_sys['safe_open'])){
+		foreach($_sys['safe_open'] as $k=>$v){
+		if($v=='3'){
+			if($code!=$s_code){msg("验证码不正确！");}
+		}
+		}
+		}
+	check_login($user,$password);
+	
+}
+
+```
+
+函数fl_value()将SQL注入的函数都替换为空。跟进/includes/fun.php这个函数，看看具体是怎么进行过滤SQL注入漏洞，
+
+```
+function fl_value($str){
+	if(empty($str)){return;}
+	return preg_replace('/select|insert | update | and | in | on | left | joins | delete |\%|\=|\/\*|\*|\.\.\/|\.\/| union | from | where | group | into |load_file
+|outfile/i','',$str);
+}
+define('INC_BEES','B'.'EE'.'SCMS');
+function fl_html($str){
+	return htmlspecialchars($str);
+}
+```
