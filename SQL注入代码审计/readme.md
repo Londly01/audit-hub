@@ -281,3 +281,4 @@ function fl_html($str){
 	return htmlspecialchars($str);
 }
 ```
+preg_replace函数是正则表达式的搜索和替换，将SQL注入敏感函数 select、insert、update、delete等函数进行替换为其他字符串,
